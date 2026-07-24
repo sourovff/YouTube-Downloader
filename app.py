@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import yt_dlp
+import os
 
 app = Flask(__name__)
 
@@ -24,13 +25,16 @@ def get_links():
             'quiet': True,
             'no_warnings': True,
             'nocheckcertificate': True,
-            # Pass iOS / Android / Web embedded client spoofing
             'extractor_args': {
                 'youtube': {
                     'player_client': ['ios', 'android', 'web']
                 }
             }
         }
+
+        # Check if cookies.txt exists in the project and use it
+        if os.path.exists('cookies.txt'):
+            ydl_opts['cookiefile'] = 'cookies.txt'
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
